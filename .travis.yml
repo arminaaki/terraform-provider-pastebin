@@ -7,9 +7,6 @@ git:
 
 install: true
 
-before_script:
-- go get github.com/golangci/golangci-lint/cmd/golangci-lint
 
 script:
-  - GO111MODULE=on go mod vendor
-  - golangci-lint run
+  - make test
