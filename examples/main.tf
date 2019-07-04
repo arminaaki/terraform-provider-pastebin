@@ -5,9 +5,9 @@ provider "pastebin" {
 }
 
 resource "pastebin_api_user_key" "api_key" {
-  name = "NAME"
+  name = "my_key"
 }
 
-# output "API KEY" {
-#   value = "${example_server.api_key.api_user_key}"
-# }
+output "API KEY" {
+  value = "${pastebin_api_user_key.api_key.api_user_key}"
+}
