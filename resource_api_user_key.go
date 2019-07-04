@@ -13,13 +13,17 @@ import (
 func resourceAPIUserKeyCreate(d *schema.ResourceData, m interface{}) error {
 
 	config := m.(*Config)
-	apiKey, err := createAPIKey(config.ApiDevKey, config.ApiUserName, config.ApiUserPassword, config.BaseUrl)
+	apiKey, responseError := createAPIKey(config.ApiDevKey, config.ApiUserName, config.ApiUserPassword, config.BaseUrl)
 
+	if responseError != nil {
+		return responseError
+	}
+	d.SetId(d.Get("name").(string))
+
+	err := d.Set("api_user_key", apiKey)
 	if err != nil {
 		return err
 	}
-	d.SetId(d.Get("name").(string))
-	d.Set("api_user_key", apiKey)
 
 	return resourceAPIUserKeyRead(d, m)
 }
