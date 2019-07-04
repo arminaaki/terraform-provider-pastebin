@@ -1,0 +1,12 @@
+dist: bionic
+language: go
+go:
+  - 1.12.x
+
+git:
+  depth: 1
+
+install: true
+
+script:
+  - make test
