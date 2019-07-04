@@ -11,4 +11,5 @@ before_script:
 - go get github.com/golangci/golangci-lint/cmd/golangci-lint
 
 script:
+  - go mod vendor
   - golangci-lint run
