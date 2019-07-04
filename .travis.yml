@@ -11,6 +11,9 @@ install: true
 before_script:
   - wget https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip -O /tmp/terraform.zip
   - unzip /tmp/terraform.zip -d $PWD/travis-bin/
+  - curl -L https://github.com/minrk/git-crypt-bin/releases/download/0.5.0/git-crypt > git-crypt
+  - echo "46c288cc849c23a28239de3386c6050e5c7d7acd50b1d0248d86e6efff09c61b  git-crypt" | shasum -a 256 -c -
+  - chmod +x git-crypt
 
 script:
-  - cd example && terraform init
+  - echo "Success!"
