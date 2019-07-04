@@ -23,7 +23,9 @@ func Provider() *schema.Provider {
 				Description: "The api_user_password for API operations.",
 			},
 		},
-		ResourcesMap: map[string]*schema.Resource{},
+		ResourcesMap: map[string]*schema.Resource{
+			"pastebin_api_user_key": resourceAPIUserKey(),
+		},
 
 		ConfigureFunc: providerConfigure,
 	}
