@@ -45,43 +45,48 @@ func resourceCreatePasteDelete(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceCreatePasteUpdate(d *schema.ResourceData, m interface{}) error { return nil }
 func resourceCreatePaste() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceCreatePasteCreate,
 		Read:   resourceCreatePasteRead,
-		Update: resourceCreatePasteUpdate,
 		Delete: resourceCreatePasteDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
 				Optional: true,
+				ForceNew: true,
 				Default:  "default",
 			},
 			"api_dev_key": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"api_paste_code": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"api_paste_private": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"api_paste_name": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"api_paste_expire_date": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"api_paste_format": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"api_user_key": {
 				Type:     schema.TypeString,
