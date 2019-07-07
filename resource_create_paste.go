@@ -153,7 +153,7 @@ func readPaste(pasteURL string) (string, error) {
 
 func pasteKey(pasteURL string) string {
 
-	re := regexp.MustCompile("https:\\/\\/pastebin\\.com\\/(.+)")
+	re := regexp.MustCompile(`https:\/\/pastebin\.com\/(.+)`)
 	match := re.FindStringSubmatch(pasteURL)
 
 	return (match[1])
