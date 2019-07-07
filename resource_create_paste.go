@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"log"
+	"net/http"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"gopkg.in/resty.v1"
@@ -13,7 +15,7 @@ func resourceCreatePasteCreate(d *schema.ResourceData, m interface{}) error {
 	// apiKey, responseError := createAPIKey(config.ApiDevKey, config.ApiUserName, config.ApiUserPassword, config.BaseUrl)
 	log.Println(createPasteAPIParams(d))
 
-	pasteURL, responseError := createPaste(createPasteAPIParams(d), config.BaseUrl)
+	pasteURL, responseError := pasteOperation(createPasteAPIParams(d), config.BaseUrl)
 	if responseError != nil {
 		return responseError
 	}
@@ -22,8 +24,16 @@ func resourceCreatePasteCreate(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceCreatePasteRead(d *schema.ResourceData, m interface{}) error   { return nil }
-func resourceCreatePasteDelete(d *schema.ResourceData, m interface{}) error { return nil }
+func resourceCreatePasteRead(d *schema.ResourceData, m interface{}) error {
+	_, responseError := readPaste(d.Id())
+	if responseError != nil {
+		d.SetId("")
+		log.Println("[DEBUG] invalid paste url")
+	}
+
+	return nil
+}
+
 func resourceCreatePasteUpdate(d *schema.ResourceData, m interface{}) error { return nil }
 
 func resourceCreatePaste() *schema.Resource {
@@ -85,7 +95,7 @@ func createPasteAPIParams(d *schema.ResourceData) map[string]string {
 	}
 }
 
-func createPaste(createPasteAPIParamas map[string]string, baseURL string) (string, error) {
+func pasteOperation(createPasteAPIParamas map[string]string, baseURL string) (string, error) {
 	resp, err := resty.SetRetryCount(3).
 		R().
 		SetFormData(createPasteAPIParamas).
@@ -94,6 +104,24 @@ func createPaste(createPasteAPIParamas map[string]string, baseURL string) (strin
 	if err != nil {
 		log.Printf("Request error: %s\n", err)
 		return "", err
+	}
+
+	return string(resp.Body()), nil
+}
+
+func readPaste(pasteURL string) (string, error) {
+	resp, err := resty.SetRetryCount(3).
+		R().
+		Get(pasteURL)
+
+	if err != nil {
+		log.Printf("Request error: %s\n", err)
+		return "", err
+	}
+
+	if resp.StatusCode() == http.StatusNotFound {
+		return "", errors.New("Paste Not Found")
+
 	}
 
 	return string(resp.Body()), nil
