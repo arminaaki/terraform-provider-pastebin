@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"regexp"
 
 	"github.com/hashicorp/terraform/helper/schema"
 	"gopkg.in/resty.v1"
@@ -34,8 +35,17 @@ func resourceCreatePasteRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceCreatePasteUpdate(d *schema.ResourceData, m interface{}) error { return nil }
+func resourceCreatePasteDelete(d *schema.ResourceData, m interface{}) error {
+	config := m.(*Config)
+	_, responseError := pasteOperation(deletePasteAPIParams(d), config.BaseUrl)
+	if responseError != nil {
+		return responseError
+	}
 
+	return nil
+}
+
+func resourceCreatePasteUpdate(d *schema.ResourceData, m interface{}) error { return nil }
 func resourceCreatePaste() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceCreatePasteCreate,
@@ -95,6 +105,15 @@ func createPasteAPIParams(d *schema.ResourceData) map[string]string {
 	}
 }
 
+func deletePasteAPIParams(d *schema.ResourceData) map[string]string {
+	return map[string]string{
+		"api_user_key":  d.Get("api_user_key").(string),
+		"api_dev_key":   d.Get("api_dev_key").(string),
+		"api_paste_key": pasteKey(d.Id()),
+		"api_option":    "delete",
+	}
+}
+
 func pasteOperation(createPasteAPIParamas map[string]string, baseURL string) (string, error) {
 	resp, err := resty.SetRetryCount(3).
 		R().
@@ -125,4 +144,12 @@ func readPaste(pasteURL string) (string, error) {
 	}
 
 	return string(resp.Body()), nil
+}
+
+func pasteKey(pasteURL string) string {
+
+	re := regexp.MustCompile("https:\\/\\/pastebin\\.com\\/(.+)")
+	match := re.FindStringSubmatch(pasteURL)
+
+	return (match[1])
 }
