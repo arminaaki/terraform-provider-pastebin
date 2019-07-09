@@ -11,12 +11,7 @@ import (
 )
 
 func resourceCreatePasteCreate(d *schema.ResourceData, m interface{}) error {
-	config := m.(*Config)
-	log.Println("HI FROM resourceCreatePasteCreate LALALALALALA")
-	// apiKey, responseError := createAPIKey(config.ApiDevKey, config.ApiUserName, config.ApiUserPassword, config.BaseUrl)
-	log.Println(createPasteAPIParams(d))
-
-	pasteURL, responseError := pasteOperation(createPasteAPIParams(d), config.BaseUrl)
+	pasteURL, responseError := pasteOperation(createPasteAPIParams(d), m.(*Config).BaseUrl)
 	if responseError != nil {
 		return responseError
 	}
@@ -36,8 +31,7 @@ func resourceCreatePasteRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceCreatePasteDelete(d *schema.ResourceData, m interface{}) error {
-	config := m.(*Config)
-	_, responseError := pasteOperation(deletePasteAPIParams(d), config.BaseUrl)
+	_, responseError := pasteOperation(deletePasteAPIParams(d), m.(*Config).BaseUrl)
 	if responseError != nil {
 		return responseError
 	}
