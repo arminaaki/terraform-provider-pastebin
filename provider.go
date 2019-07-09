@@ -26,6 +26,7 @@ func Provider() terraform.ResourceProvider {
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"pastebin_api_user_key": resourceAPIUserKey(),
+			"pastebin_create_paste": resourceCreatePaste(),
 		},
 
 		ConfigureFunc: providerConfigure,
