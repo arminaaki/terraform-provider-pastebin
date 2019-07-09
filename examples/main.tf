@@ -20,4 +20,5 @@ resource "pastebin_create_paste" "pasteA" {
   api_paste_name        = "main.rb"
   api_paste_expire_date = "10M"
   api_paste_format      = "ruby"
+  api_paste_private     = "2"
 }
