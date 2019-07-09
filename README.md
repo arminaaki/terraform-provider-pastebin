@@ -63,4 +63,4 @@ resource "pastebin_create_paste" "pasteA" {
 }
 ```
 
-
+![Demo](examples/images/demo.png)
