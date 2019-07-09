@@ -1,6 +1,10 @@
 
 PLUGINS_DIR = $$HOME/.terraform.d/plugins
 
+lintcheck:
+	- npm install -g markdownlint-cli
+	- markdownlint README.md
+
 build:
 	mkdir -p $(PLUGINS_DIR)
 	go build -o $(PLUGINS_DIR)/terraform-provider-pastebin
