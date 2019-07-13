@@ -2,7 +2,7 @@
 PLUGINS_DIR := $$HOME/.terraform.d/plugins
 DIST_DIR    := pkg
 BINARY_NAME := terraform-provider-pastebin
-VERSION     := 0.1.0
+VERSION     := v0.1.0
 
 lintcheck:
 	- npm install -g markdownlint-cli
@@ -22,8 +22,9 @@ test: test-dep
 release:
 	mkdir -p $(DIST_DIR)
 	go get github.com/mitchellh/gox
+	go get github.com/tcnksm/ghr
 	gox --parallel=10 -os="linux darwin " -arch="amd64 386" -output="$(DIST_DIR)/${BINARY_NAME}-$(VERSION)-{{.OS}}-{{.Arch}}" .
-
+	@ghr --username  arminaaki --token $(GITHUB_TOKEN) --replace --prerelease --debug $(VERSION) $(DIST_DIR)/
 
 clean:
 	rm -rf $(PLUGINS_DIR)/$(BINARY_NAME)
