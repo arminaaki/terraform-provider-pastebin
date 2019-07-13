@@ -29,17 +29,16 @@ func resourceAPIUserKeyCreate(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceAPIUserKeyRead(d *schema.ResourceData, m interface{}) error {
-	log.Println("HI FROM resourceAPIUserKeyRead")
 
 	config := m.(*Config)
-	api_user_key := d.Get("api_user_key").(string)
-	if api_user_key == "" {
+	APIUserKey := d.Get("api_user_key").(string)
+	if APIUserKey == "" {
 		log.Println("Emty api_user_key")
 		return nil
 	}
 	listPastesParams := map[string]string{
 		"api_dev_key":       config.ApiDevKey,
-		"api_user_key":      api_user_key,
+		"api_user_key":      APIUserKey,
 		"api_results_limit": "1",
 		"api_option":        "list",
 	}
@@ -128,11 +127,11 @@ func validateAPIUserKey(response string) error {
 	return nil
 }
 
-func urlBuilder(path string, BaseUrl string) string {
-	return fmt.Sprintf("%s/%s", BaseUrl, path)
+func urlBuilder(path string, BaseURL string) string {
+	return fmt.Sprintf("%s/%s", BaseURL, path)
 }
 
-func createAPIKey(APIDevKey string, APIUserName string, APIUserPassword string, BaseUrl string) (string, error) {
+func createAPIKey(APIDevKey string, APIUserName string, APIUserPassword string, BaseURL string) (string, error) {
 	createAPIKeyParams := map[string]string{
 		"api_dev_key":       APIDevKey,
 		"api_user_name":     APIUserName,
@@ -142,7 +141,7 @@ func createAPIKey(APIDevKey string, APIUserName string, APIUserPassword string, 
 	resp, err := resty.SetRetryCount(3).
 		R().
 		SetFormData(createAPIKeyParams).
-		Post(urlBuilder("api/api_login.php", BaseUrl))
+		Post(urlBuilder("api/api_login.php", BaseURL))
 
 	if err != nil {
 		log.Printf("Request error: %s\n", err)
