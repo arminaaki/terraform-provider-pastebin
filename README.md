@@ -21,8 +21,9 @@ your pastes in Pastebin.
 
 ## Quickstart
 
-The binary artifacts are not currently available for the provider
-, so building from the sourde is required.
+The binary artifacts are available
+in [release](https://github.com/arminaaki/terraform-provider-pastebin/releases) page.
+These builds are generated from the master branch.
 This project uses
 [go modules](https://github.com/golang/go/wiki/Modules) to manage its dependecies.
 
