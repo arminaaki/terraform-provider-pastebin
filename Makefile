@@ -1,5 +1,8 @@
 
-PLUGINS_DIR = $$HOME/.terraform.d/plugins
+PLUGINS_DIR := $$HOME/.terraform.d/plugins
+DIST_DIR    := pkg
+BINARY_NAME := terraform-provider-pastebin
+VERSION     := 0.1.0
 
 lintcheck:
 	- npm install -g markdownlint-cli
@@ -7,7 +10,7 @@ lintcheck:
 
 build:
 	mkdir -p $(PLUGINS_DIR)
-	go build -o $(PLUGINS_DIR)/terraform-provider-pastebin
+	go build -o $(PLUGINS_DIR)/$(BINARY_NAME)
 
 test-dep:
 	go get github.com/golangci/golangci-lint/cmd/golangci-lint
@@ -16,5 +19,12 @@ test: test-dep
 	golangci-lint run
 
 
+release:
+	mkdir -p $(DIST_DIR)
+	go get github.com/mitchellh/gox
+	gox --parallel=10 -os="linux darwin " -arch="amd64 386" -output="$(DIST_DIR)/${BINARY_NAME}-$(VERSION)-{{.OS}}-{{.Arch}}" .
+
+
 clean:
-	rm -rf $(PLUGINS_DIR)/terraform-provider-pastebin
+	rm -rf $(PLUGINS_DIR)/$(BINARY_NAME)
+
