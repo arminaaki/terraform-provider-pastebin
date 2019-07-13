@@ -1,6 +1,7 @@
 # Terraform provider for Pastebin
 
 [![Build Status](https://travis-ci.org/arminaaki/terraform-provider-pastebin.svg?branch=master)](https://travis-ci.org/arminaaki/terraform-provider-pastebin)
+[![Go Report Card](https://goreportcard.com/badge/github.com/arminaaki/terraform-provider-pastebin)](https://goreportcard.com/report/github.com/arminaaki/terraform-provider-pastebin)
 
 ## Table of Content
 
