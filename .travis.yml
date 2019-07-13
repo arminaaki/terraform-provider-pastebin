@@ -11,3 +11,10 @@ install: true
 script:
   - make test
   - make lintcheck
+
+deploy:
+  - provider: script
+    script: make release
+    skip_cleanup: true
+    on:
+      branch: master
