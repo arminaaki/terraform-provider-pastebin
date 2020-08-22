@@ -1,28 +1,41 @@
 package main
 
 import (
-	"errors"
 	"log"
-	"net/http"
 	"regexp"
 
+	"context"
+
+	"github.com/arminaaki/gopastebin"
 	"github.com/hashicorp/terraform/helper/schema"
-	"gopkg.in/resty.v1"
 )
 
 func resourceCreatePasteCreate(d *schema.ResourceData, m interface{}) error {
-	pasteURL, responseError := pasteOperation(createPasteAPIParams(d), m.(*Config).BaseUrl)
-	if responseError != nil {
-		return responseError
+	client, _ := gopastebin.NewClient(&gopastebin.AccountRequest{
+		APIDevKey:       m.(*Config).ApiDevKey,
+		APIUserName:     m.(*Config).ApiUserName,
+		APIUserPassword: m.(*Config).ApiUserPassword,
+	})
+
+	result, _, err := client.Paste.Create(context.TODO(), createPasteAPIParams(d))
+	if err != nil {
+		panic(err)
 	}
-	d.SetId(pasteURL)
+
+	d.SetId(result.PasteURL)
 
 	return nil
 }
 
 func resourceCreatePasteRead(d *schema.ResourceData, m interface{}) error {
-	_, responseError := readPaste(d.Id())
-	if responseError != nil {
+
+	client, _ := gopastebin.NewClient(&gopastebin.AccountRequest{
+		APIDevKey:       m.(*Config).ApiDevKey,
+		APIUserName:     m.(*Config).ApiUserName,
+		APIUserPassword: m.(*Config).ApiUserPassword,
+	})
+	_, _, err := client.Paste.GetRaw(context.TODO(), &gopastebin.PasteGetRawRequest{})
+	if err != nil {
 		d.SetId("")
 		log.Println("[DEBUG] invalid paste url")
 	}
@@ -31,9 +44,15 @@ func resourceCreatePasteRead(d *schema.ResourceData, m interface{}) error {
 }
 
 func resourceCreatePasteDelete(d *schema.ResourceData, m interface{}) error {
-	_, responseError := pasteOperation(deletePasteAPIParams(d), m.(*Config).BaseUrl)
-	if responseError != nil {
-		return responseError
+	client, _ := gopastebin.NewClient(&gopastebin.AccountRequest{
+		APIDevKey:       m.(*Config).ApiDevKey,
+		APIUserName:     m.(*Config).ApiUserName,
+		APIUserPassword: m.(*Config).ApiUserPassword,
+	})
+
+	_, err := client.Paste.Delete(context.TODO(), deletePasteAPIParams(d))
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -53,9 +72,10 @@ func resourceCreatePaste() *schema.Resource {
 				Default:  "default",
 			},
 			"api_dev_key": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				ForceNew:  true,
+				Sensitive: true,
 			},
 			"api_paste_code": {
 				Type:     schema.TypeString,
@@ -83,72 +103,30 @@ func resourceCreatePaste() *schema.Resource {
 				ForceNew: true,
 			},
 			"api_user_key": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				ForceNew:  true,
+				Sensitive: true,
 			},
 		},
 	}
 }
 
-func createPasteAPIParams(d *schema.ResourceData) map[string]string {
-	return map[string]string{
-		"api_user_key":          d.Get("api_user_key").(string),
-		"api_dev_key":           d.Get("api_dev_key").(string),
-		"api_paste_code":        d.Get("api_paste_code").(string),
-		"api_paste_private":     d.Get("api_paste_private").(string),
-		"api_paste_name":        d.Get("api_paste_name").(string),
-		"api_paste_expire_date": d.Get("api_paste_expire_date").(string),
-		"api_paste_format":      d.Get("api_paste_format").(string),
-		"api_option":            "paste",
+func createPasteAPIParams(d *schema.ResourceData) *gopastebin.PasteRequest {
+
+	return &gopastebin.PasteRequest{
+		APIPasteName:       d.Get("api_paste_name").(string),
+		APIPasteCode:       d.Get("api_paste_code").(string),
+		APIPasteFormat:     d.Get("api_paste_format").(string),
+		APIPastePrivate:    d.Get("api_paste_private").(string),
+		APIPasteExpireDate: d.Get("api_paste_expire_date").(string),
 	}
 }
 
-func deletePasteAPIParams(d *schema.ResourceData) map[string]string {
-	return map[string]string{
-		"api_user_key":  d.Get("api_user_key").(string),
-		"api_dev_key":   d.Get("api_dev_key").(string),
-		"api_paste_key": pasteKey(d.Id()),
-		"api_option":    "delete",
-	}
-}
-
-func pasteOperation(createPasteAPIParamas map[string]string, baseURL string) (string, error) {
-	resp, err := resty.SetRetryCount(3).
-		R().
-		SetFormData(createPasteAPIParamas).
-		Post(urlBuilder("api/api_post.php", baseURL))
-
-	if err != nil {
-		log.Printf("Request error: %s\n", err)
-		return "", err
-	}
-
-	return string(resp.Body()), nil
-}
-
-func readPaste(pasteURL string) (string, error) {
-	resp, err := resty.SetRetryCount(3).
-		R().
-		Get(pasteURL)
-
-	if err != nil {
-		log.Printf("Request error: %s\n", err)
-		return "", err
-	}
-
-	if resp.StatusCode() == http.StatusNotFound {
-		return "", errors.New("Paste Not Found")
-
-	}
-
-	return string(resp.Body()), nil
-}
-
-func pasteKey(pasteURL string) string {
-
+func deletePasteAPIParams(d *schema.ResourceData) *gopastebin.PasteDeleteRequest {
 	re := regexp.MustCompile(`https:\/\/pastebin\.com\/(.+)`)
-	match := re.FindStringSubmatch(pasteURL)
 
-	return (match[1])
+	return &gopastebin.PasteDeleteRequest{
+		APIPasteKey: re.FindStringSubmatch(d.Id())[1],
+	}
 }
