@@ -1,0 +1,22 @@
+name: markdown-lint
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: lint
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: "2.6"
+      - run: gem install bundler --no-document
+      - run: gem install rake --no-document
+      - run: git clone https://github.com/markdownlint/markdownlint && cd markdownlint && rake install
+      - run: mdl README.md
