@@ -42,7 +42,6 @@ As a member of pastebin, you will be given a unique  [developer API key](https:/
 Here is an example that will create a private paste for your provided account.
 
 ```hcl
-  
 provider "pastebin" {
   api_dev_key       = var.api_dev_key
   api_user_name     = var.api_user_name
