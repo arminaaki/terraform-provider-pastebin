@@ -42,19 +42,20 @@ As a member of pastebin, you will be given a unique  [developer API key](https:/
 Here is an example that will create a private paste for your provided account.
 
 ```hcl
+  
 provider "pastebin" {
-  api_dev_key       = "YOUR_API_DEV_KEY"
-  api_user_name     = "YOUR_API_USERNAME"
-  api_user_password = "YOUR_API_PASSWORD"
+  api_dev_key       = var.api_dev_key
+  api_user_name     = var.api_user_name
+  api_user_password = var.api_user_password
 }
 
-resource "pastebin_api_user_key" "sample" {
-  name = "keyA"
+resource "pastebin_api_user_key" "api_key" {
+  name = "my_key"
 }
 
 resource "pastebin_create_paste" "pasteA" {
   name                  = "pasteA"
-  api_user_key          = "${pastebin_api_user_key.sample.api_user_key}"
+  api_user_key          = pastebin_api_user_key.api_key.api_user_key
   api_dev_key           = var.api_dev_key
   api_paste_code        = "puts 'Hello World'"
   api_paste_name        = "main.rb"
